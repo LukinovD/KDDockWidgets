@@ -20,6 +20,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QTimer>
 
 using namespace KDDockWidgets;
 
@@ -53,11 +54,15 @@ void TitleBarWidget::init()
     m_minimizeButton = TitleBarWidget::createButton(this, style()->standardIcon(QStyle::SP_TitleBarMinButton));
     m_floatButton = TitleBarWidget::createButton(this, style()->standardIcon(QStyle::SP_TitleBarNormalButton));
     m_closeButton = TitleBarWidget::createButton(this, style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+    m_autoHideButton = TitleBarWidget::createButton(this, style()->standardIcon(QStyle::SP_TitleBarMinButton)); // TODO change icon
 
+    m_layout->addWidget(m_autoHideButton);
     m_layout->addWidget(m_minimizeButton);
     m_layout->addWidget(m_maximizeButton);
     m_layout->addWidget(m_floatButton);
     m_layout->addWidget(m_closeButton);
+
+    m_minimizeButton->setVisible(false);
 
     connect(m_floatButton, &QAbstractButton::clicked, this, &TitleBarWidget::onFloatClicked);
     connect(m_closeButton, &QAbstractButton::clicked, this, &TitleBarWidget::onCloseClicked);

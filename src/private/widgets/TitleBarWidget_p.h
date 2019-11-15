@@ -66,10 +66,11 @@ private:
     QRect iconRect() const;
 
     QHBoxLayout *const m_layout;
+    QAbstractButton *m_minimizeButton = nullptr;
     QAbstractButton *m_closeButton = nullptr;
     QAbstractButton *m_floatButton = nullptr;
     QAbstractButton *m_maximizeButton = nullptr;
-    QAbstractButton *m_minimizeButton = nullptr;
+    QAbstractButton *m_autoHideButton = nullptr;
     QLabel *m_dockWidgetIcon = nullptr;
 };
 
