@@ -16,6 +16,7 @@
 #include "WindowBeingDragged_p.h"
 #include "Utils_p.h"
 #include "FrameworkWidgetFactory.h"
+#include "Config.h"
 
 #include <QWindowStateChangeEvent>
 #include <QTimer>
@@ -27,6 +28,7 @@ TitleBar::TitleBar(Frame *parent)
     , Draggable(this)
     , m_frame(parent)
     , m_floatingWindow(nullptr)
+    , m_supportsAutoHide(Config::self().supportsAutoHide())
 {
     connect(m_frame, &Frame::numDockWidgetsChanged, this, &TitleBar::updateCloseButton);
     connect(m_frame, &Frame::isFocusedChanged, this, &TitleBar::isFocusedChanged);
@@ -38,6 +40,14 @@ TitleBar::TitleBar(Frame *parent)
         setFocusPolicy(Qt::StrongFocus);
 
     QTimer::singleShot(0, this, &TitleBar::updateAutoHideButton); // have to wait after the frame is constructed
+
+    auto t = new QTimer();
+    t->start(1000);
+    t->callOnTimeout(this, [this] {
+       updateAutoHideButton();
+    });
+    QTimer::singleShot(0, this, &TitleBar::updateMinimizeButton); // have to wait after the frame is constructed
+
 }
 
 TitleBar::TitleBar(FloatingWindow *parent)
@@ -45,6 +55,7 @@ TitleBar::TitleBar(FloatingWindow *parent)
     , Draggable(this)
     , m_frame(nullptr)
     , m_floatingWindow(parent)
+    , m_supportsAutoHide(Config::self().supportsAutoHide())
 {
     connect(m_floatingWindow, &FloatingWindow::numFramesChanged, this, &TitleBar::updateCloseButton);
     connect(m_floatingWindow, &FloatingWindow::numFramesChanged, this, &TitleBar::updateFloatButton);
@@ -54,6 +65,14 @@ TitleBar::TitleBar(FloatingWindow *parent)
     connect(m_floatingWindow, &FloatingWindow::activatedChanged , this, &TitleBar::isFocusedChanged);
     init();
     updateMinimizeButton(); // always hidden when we're in a FloatingWindow.
+
+    auto t = new QTimer();
+    t->start(1000);
+    t->callOnTimeout([this] {
+
+        updateMinimizeButton();
+    });
+
 }
 
 void TitleBar::init()
@@ -207,7 +226,7 @@ bool TitleBar::supportsMinimizeButton() const
 bool TitleBar::supportsAutoHideButton() const
 {
     // Only dock widgets docked into the MainWindow can minimize
-    return m_frame && m_frame->isInMainWindow();
+    return m_supportsAutoHide && m_frame && m_frame->isInMainWindow();
 }
 
 bool TitleBar::hasIcon() const
@@ -330,5 +349,12 @@ void TitleBar::onMinimizeClicked()
 
 void TitleBar::onAutoHideClicked()
 {
-
+    if (m_frame) {
+        const auto &dockwidgets = m_frame->dockWidgets();
+        for (DockWidgetBase *dw : dockwidgets)
+            dw->minimize();
+    } else {
+        // Doesn't happen
+        qWarning() << Q_FUNC_INFO << "Minimize not supported on floating windows";
+    }
 }

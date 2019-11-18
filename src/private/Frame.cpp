@@ -364,6 +364,12 @@ FloatingWindow *Frame::floatingWindow() const
     return nullptr;
 }
 
+MainWindowBase *Frame::mainWindow() const
+{
+    return m_dropArea ? m_dropArea->mainWindow()
+                      : nullptr;
+}
+
 void Frame::restoreToPreviousPosition()
 {
     if (hasSingleDockWidget()) {
@@ -519,6 +525,11 @@ void Frame::setDropArea(DropArea *dt)
     }
 }
 
+DropArea *Frame::dropArea() const
+{
+    return m_dropArea;
+}
+
 bool Frame::isTheOnlyFrame() const
 {
     qCDebug(docking) << "Frame::isTheOnlyFrame() m_dropArea=" << m_dropArea << "; numFrames"
@@ -541,7 +552,7 @@ bool Frame::isInFloatingWindow() const
 
 bool Frame::isInMainWindow() const
 {
-    return m_dropArea && m_dropArea->isInMainWindow();
+    return mainWindow() != nullptr;
 }
 
 bool Frame::event(QEvent *e)
@@ -553,7 +564,9 @@ bool Frame::event(QEvent *e)
         } else {
             setDropArea(nullptr);
         }
+        qDebug() << "Parent changed to " << QWidgetAdapter::parentWidget();
     }
+
 
     return QWidgetAdapter::event(e);
 }

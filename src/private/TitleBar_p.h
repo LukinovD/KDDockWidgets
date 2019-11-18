@@ -133,6 +133,7 @@ private:
 
     Frame *const m_frame;
     FloatingWindow *const m_floatingWindow;
+    const bool m_supportsAutoHide;
 };
 
 

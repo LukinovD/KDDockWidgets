@@ -168,6 +168,11 @@ QQmlEngine *Config::qmlEngine() const
     return d->m_qmlEngine;
 }
 
+bool Config::supportsAutoHide() const
+{
+    return d->m_flags & Flag_AutoHideSupport;
+}
+
 void Config::Private::fixFlags()
 {
 #if defined(Q_OS_WIN)

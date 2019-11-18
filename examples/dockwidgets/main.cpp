@@ -102,6 +102,9 @@ int main(int argc, char **argv)
 
     QCommandLineOption centralFrame("f", QCoreApplication::translate("main", "Persistent central frame"));
 
+    QCommandLineOption autoHideSupport("w", QCoreApplication::translate("main", "Enables auto-hide/minimization to side-bar support"));
+    parser.addOption(autoHideSupport);
+
 #if defined(DOCKS_DEVELOPER_MODE)
     parser.addOption(centralFrame);
 
@@ -127,8 +130,13 @@ int main(int argc, char **argv)
         Config::self().setSeparatorThickness(10);
     }
 
+
     if (parser.isSet(segmentedIndicators))
         KDDockWidgets::DefaultWidgetFactory::s_dropIndicatorType = KDDockWidgets::DropIndicatorType::Segmented;
+
+    if (parser.isSet(autoHideSupport))
+        Config::self().setFlags(Config::self().flags() | Config::Flag_AutoHideSupport);
+
 
     MainWindowOptions options = MainWindowOption_None;
     auto flags = KDDockWidgets::Config::self().flags();

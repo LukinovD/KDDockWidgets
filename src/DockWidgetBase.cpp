@@ -325,7 +325,7 @@ void DockWidgetBase::setTitle(const QString &title)
     if (title != d->title) {
         d->title = title;
         d->updateTitle();
-        Q_EMIT titleChanged();
+        Q_EMIT titleChanged(title);
     }
 }
 
@@ -484,6 +484,12 @@ void DockWidgetBase::setAffinities(const QStringList &affinityNames)
     d->affinities = affinities;
 }
 
+void DockWidgetBase::minimize()
+{
+    if (MainWindowBase *m = mainWindow())
+        m->minimizeDockWidget(this);
+}
+
 FloatingWindow *DockWidgetBase::morphIntoFloatingWindow()
 {
     qCDebug(creation) << "DockWidget::morphIntoFloatingWindow() this=" << this
@@ -536,6 +542,12 @@ Frame *DockWidgetBase::frame() const
 FloatingWindow *DockWidgetBase::floatingWindow() const
 {
     return d->floatingWindow();
+}
+
+MainWindowBase *DockWidgetBase::mainWindow() const
+{
+    Frame *f = frame();
+    return f ? f->mainWindow() : nullptr;
 }
 
 void DockWidgetBase::addPlaceholderItem(Layouting::Item *item)
